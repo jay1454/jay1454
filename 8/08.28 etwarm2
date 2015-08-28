@@ -1,0 +1,24 @@
+import requests
+from bs4 import BeautifulSoup
+from math import ceil
+
+res = requests.get('http://www.etwarm.com.tw/object_list.php?city=%E5%8F%B0%E5%8C%97%E5%B8%82&area=&price1=&price2=&x=37&y=14&ping_1=0&ping_2=upward&house_old=&house_old2=soso&keyword=%E8%AB%8B%E8%BC%B8%E5%85%A5%E9%97%9C%E9%8D%B5%E5%AD%97%EF%BC%8C%E5%8F%AF%E4%B8%8D%E5%A1%AB&view=10&orderby=price&page=1')
+#res.enconding='utf8'
+soup = BeautifulSoup(res.text)
+
+
+cases = soup.select('#select_2')[0].text.encode('utf8').split('/')[1].split('：')[1]
+pages = int(ceil(float(cases)/10))
+print cases
+print pages
+
+f = open('etwarm.txt','w')
+page_format = 'http://www.etwarm.com.tw/object_list.php?city=%E5%8F%B0%E5%8C%97%E5%B8%82&area=&price1=&price2=&x=37&y=14&ping_1=0&ping_2=upward&house_old=&house_old2=soso&keyword=%E8%AB%8B%E8%BC%B8%E5%85%A5%E9%97%9C%E9%8D%B5%E5%AD%97%EF%BC%8C%E5%8F%AF%E4%B8%8D%E5%A1%AB&view=10&orderby=price&page=1'
+for page in range(1, pages +1):
+    res = requests.get(page_format.format(page))
+    print page
+    soup = BeautifulSoup(res.text)
+    for ele in soup.select('#object_inpage_list_title a'):
+        f.write('http://www.etwarm.com.tw/'+ele['href']+'\n')
+        #f.write('http://www.etwarm.com.tw'+ele['href'][1:]+'\n')
+f.close()
